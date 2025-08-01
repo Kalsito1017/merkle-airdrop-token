@@ -81,6 +81,16 @@ contract MerkleAirdrop is EIP712 {
         emit Claimed(account, amount); // Emit the Claimed event
         i_airdropToken.transfer(account, amount); // Transfer the airdrop tokens to the account
     }
+
+    /// @notice Verifies if the provided signature is valid for the given account and digest.
+    /// @dev Uses ECDSA to recover the signer address from the signature components (v, r, s),
+    ///      and checks if the recovered signer matches the expected account.
+    /// @param account The address expected to have signed the message.
+    /// @param digest The EIP-712 hash of the signed message.
+    /// @param v The recovery identifier of the signature (27 or 28).
+    /// @param r First 32 bytes of the ECDSA signature.
+    /// @param s Second 32 bytes of the ECDSA signature.
+    /// @return isValid True if the recovered signer matches the account, false otherwise.
     function _isValidSignature(
         address account,
         bytes32 digest,
@@ -88,23 +98,44 @@ contract MerkleAirdrop is EIP712 {
         bytes32 r,
         bytes32 s
     ) internal pure returns (bool) {
+        // Try to recover the signer from the provided signature
         (address ActualSigner, , ) = ECDSA.tryRecover(digest, v, r, s);
+
+        // Return true if recovered signer matches the expected account
         return ActualSigner == account;
     }
+
+    /// @notice Computes the EIP-712 typed data hash for a given airdrop claim.
+    /// @dev This hash is generated using the EIP-712 encoding and is used for off-chain signing.
+    /// @param account The wallet address of the user claiming the airdrop.
+    /// @param amount The amount of tokens being claimed.
+    /// @return messageHash A keccak256 hash of the encoded claim data, wrapped in EIP-712 domain.
     function getMessageHash(
         address account,
         uint256 amount
     ) public view returns (bytes32) {
+        // Returns a digest compatible with EIP-712 typed data signing
         return
             _hashTypedDataV4(
                 keccak256(
-                    abi.encode(MESSAGE_TYPEHASH, AirdropClaim(account, amount))
+                    abi.encode(
+                        MESSAGE_TYPEHASH, // keccak256 hash of the struct type
+                        AirdropClaim(account, amount) // struct instance
+                    )
                 )
             );
     }
+
+    /// @notice Returns the Merkle root currently stored in the contract.
+    /// @dev This Merkle root is used to verify airdrop eligibility using Merkle proofs.
+    /// @return root The stored Merkle root.
     function getMerkleRoot() external view returns (bytes32) {
         return i_merkleRoot;
     }
+
+    /// @notice Returns the ERC-20 token used for airdrops.
+    /// @dev The token must implement the IERC20 interface.
+    /// @return token The address of the airdrop token contract.
     function getAirdropToken() external view returns (IERC20) {
         return i_airdropToken;
     }
