@@ -24,7 +24,7 @@ This project deploys a custom ERC-20 token called **`KalsitoToken`**, alongside 
 - Uses minimal on-chain storage for gas efficiency
 
 ### 📜 Scripts
-- `DeployAirdrop.s.sol`: Deploys token & airdrop contracts and funds the airdrop  
+- `DeployMerkleAirdrop.s.sol`: Deploys token & airdrop contracts and funds the airdrop  
 - `Interact.s.sol`: Reads signatures, splits them, and calls claim functions
 
 ### 🧪 Tests
