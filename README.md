@@ -30,3 +30,8 @@ This project deploys a custom ERC-20 token called **`KalsitoToken`**, alongside 
 ### 🧪 Tests
 - Located in `test/` folder  
 - Cover Merkle proof verification, claim logic, signature checks, and reentrancy
+
+- 
+## Disclaimer
+
+This codebase is for educational purposes only and has not undergone a security review.
